@@ -20,10 +20,6 @@
             var relationship_status = document.getElementById("relationship_status").value;
             var pet_status = document.getElementById("pet_status").value;
             var hobbies = document.getElementById("hobbies").value;
-
-            console.log("ID:", id);
-            console.log("Password:", password);
-
             if (id === "" || password === "" || name === "" || motivation === "" || relationship_status === "" || pet_status === "") {
                 alert("필수 항목을 모두 작성해 주세요");
                 return;
@@ -49,11 +45,11 @@
                 }),
                 success: function (response) {
                     console.log("Signup successful");
-                    // 회원가입 성공 시 추가 동작 수행
+                    window.location.href = "/"; 
                 },
                 error: function (xhr, status, error) {
                     console.error("Error:", error);
-                    // 에러 처리
+                    alert(xhr.responseJSON.message);
                 }
             });
         }

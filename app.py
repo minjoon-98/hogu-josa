@@ -5,10 +5,12 @@ from pymongo import MongoClient
 import jwt
 
 app = Flask(__name__)
+
 # MongoDB 연결 설정
 client = MongoClient('localhost', 27017)
 db = client.hogu_user_db
 users_collection = db.users
+refresh_tokens_collection = db.refresh_tokens #리프레시토큰 저장 컬렉션
 
 app.config['JWT_SECRET_KEY'] = 'hogu' # JWT 시크릿 키 설정
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=10) # JWT 토큰 만료 시간 설정
@@ -24,6 +26,9 @@ def is_token_valid(token):
         return False
     return False
 
+@app.route('/test')
+def test():
+    return jsonify({"data": request.headers.get('Authorization')})
 
 @app.route('/')
 def index():
@@ -107,9 +112,18 @@ def login():
         access_token = create_access_token(identity=id)
         refresh_token = create_refresh_token(identity=id)
 
+        # 리프레시 토큰 저장
+        refresh_tokens_collection.insert_one({'refresh_token': refresh_token})
+
         return jsonify({'access_token': access_token, 'refresh_token':refresh_token}), 200
     else:
         return jsonify({'message': '인증 실패'}), 401
+    
+# 사용자 정보를 가져오는 엔드포인트
+@app.route('/users', methods=['GET'])
+def get_users():
+    users = list(users_collection.find({}, {'_id': 0}))  # 모든 사용자 정보를 가져옴
+    return jsonify(users), 200
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5001, debug=True)

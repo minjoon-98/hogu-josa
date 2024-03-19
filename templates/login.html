@@ -7,7 +7,7 @@
     <title>Login Page</title>
     <link href="https://fonts.googleapis.com/css?family=Hepta+Slab:300,500" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
-    <link rel="stylesheet" href="./style.css"> <!-- Include your external CSS file -->
+
     <style>
         /* Adjusted CSS styles */
         /* You can remove this style block if you have linked the external CSS file correctly */
@@ -100,10 +100,12 @@
                 contentType: "application/json",
                 data: JSON.stringify({ id: id, password: password }),
                 success: function (response) {
+                    console.log('access_token:', response.access_token);
+                    console.log('refresh_token:', response.refresh_token);
                     localStorage.setItem('access_token', response.access_token); // 토큰을 로컬 스토리지에 저장
                     localStorage.setItem('refresh_token', response.refresh_token); // 리프레시 토큰을 로컬 스토리지에 저장
                     console.log("Login successful");
-                    // 로그인 성공 시 추가 동작 수행
+                    
                     window.location.href = "/main"; // 로그인 성공 시 메인 페이지로 이동
                 },
                 error: function (xhr, status, error) {
@@ -133,6 +135,13 @@
                     // 에러 처리
                 }
             });
+        }
+
+        window.onload = function(){
+            var refresh_token = localStorage.getItem('refresh_token');
+            if (!refresh_token) {
+                refreshAccessToken();
+            }
         }
     </script>
 </head>

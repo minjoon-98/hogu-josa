@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // 서버에서 사용자 정보를 가져오는 함수
+            function getUsers() {
+                // 로컬 스토리지에서 토큰 가져오기
+                var access_token = localStorage.getItem('access_token');
+                var refresh_token = localStorage.getItem('refresh_token');
+
+                // access_token을 헤더에 포함하여 GET 요청을 보냄
+                $.ajax({
+                    type: "GET",
+                    url: "http://localhost:5001/users",
+                    headers: { "Authorization": "Bearer " + access_token },
+                    success: function (response) {
+                        // 성공 시 사용자 정보를 처리
+                        var users = response.users;
+                        // 사용자 정보를 카드 형식으로 표시
+                        users.forEach(function (user) {
+                            var cardHtml = '<div class="card">';
+                            cardHtml += '<h2>' + user.name + '</h2>';
+                            cardHtml += '<p>' + user.motivation + '</p>';
+                            cardHtml += '</div>';
+                            $('#user-container').append(cardHtml);
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error:", error);
+                        // 토큰이 만료되었을 경우에 대한 처리
+                        if (xhr.status === 401 && error === "Unauthorized") {
+                            // 토큰 갱신
+                            // (refresh_token을 사용하여 새로운 access_token을 발급받는 요청을 보냄)
+                            // 이후 다시 getUsers() 함수 호출
+                        }
+                    }
+                });
+            }
+
+            // 페이지 로드 시 getUsers() 함수 호출
+            getUsers();
+        });
+    </script>
+    <style>
+        /* Adjusted CSS styles for card layout */
+        .card {
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            transition: 0.3s;
+            width: 200px;
+            margin: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            text-align: center;
+            float: left;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        /* Add other styles as needed */
+    </style>
+</head>
+<body>
+    <h1>사용자 정보</h1>
+    <div id="user-container">
+        <!-- 사용자 정보를 표시할 곳 -->
+    </div>
+</body>
+</html>

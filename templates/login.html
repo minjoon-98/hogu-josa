@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,22 +17,27 @@
             background: #efecdb;
             color: #5D4037;
         }
+
         * {
             box-sizing: border-box;
         }
+
         /* hide scrollbar */
         ::-webkit-scrollbar {
             width: 1px;
             height: 1px;
         }
+
         ::-webkit-scrollbar-button {
             width: 1px;
             height: 1px;
         }
+
         .external {
             overflow: hidden;
             height: 100vh;
         }
+
         .horizontal-scroll-wrapper {
             display: -webkit-box;
             display: flex;
@@ -41,8 +47,8 @@
             -webkit-box-align: center;
             align-items: center;
             width: 100vh;
-            -webkit-transform: rotate(-90deg) translate3d(0,-100vh,0);
-            transform: rotate(-90deg) translate3d(0,-100vh,0);
+            -webkit-transform: rotate(-90deg) translate3d(0, -100vh, 0);
+            transform: rotate(-90deg) translate3d(0, -100vh, 0);
             -webkit-transform-origin: right top;
             transform-origin: right top;
             overflow-y: auto;
@@ -55,6 +61,7 @@
             transform-style: preserve-3d;
             padding-bottom: 10rem;
         }
+
         .img-wrapper {
             -webkit-transform: rotate(90deg);
             transform: rotate(90deg);
@@ -72,9 +79,11 @@
             -webkit-transition: 1s;
             transition: 1s;
         }
+
         .img-wrapper:hover {
             min-height: 65vh;
         }
+
         /* Add other styles as needed */
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -91,9 +100,33 @@
                 contentType: "application/json",
                 data: JSON.stringify({ id: id, password: password }),
                 success: function (response) {
-                    localStorage.setItem('token', response.access_token); // 토큰을 로컬 스토리지에 저장
+                    localStorage.setItem('access_token', response.access_token); // 토큰을 로컬 스토리지에 저장
+                    localStorage.setItem('refresh_token', response.refresh_token); // 리프레시 토큰을 로컬 스토리지에 저장
                     console.log("Login successful");
                     // 로그인 성공 시 추가 동작 수행
+                    window.location.href = "/main"; // 로그인 성공 시 메인 페이지로 이동
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error:", error);
+                    // 에러 처리
+                }
+            });
+        }
+        // localStorage에 저장된 refresh_token을 사용하여 새로운 access_token을 발급받는 함수
+        function refreshAccessToken() {
+            var refresh_token = localStorage.getItem('refresh_token');
+
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:5001/refresh",
+                contentType: "application/json",
+                headers: {
+                    'Authorization': 'Bearer ' + refresh_token
+                },
+                success: function (response) {
+                    localStorage.setItem('access_token', response.access_token); // 새로운 access_token을 로컬 스토리지에 저장
+                    console.log("Access token refreshed successfully");
+                    // 새로운 access_token을 받아온 후 수행할 동작
                 },
                 error: function (xhr, status, error) {
                     console.error("Error:", error);
@@ -103,6 +136,7 @@
         }
     </script>
 </head>
+
 <body>
     <h1>호구조사 Login Page</h1>
     <form>
@@ -114,4 +148,5 @@
     </form>
     <p>계정이 없으신가요? <a href="/signup">회원가입</a></p>
 </body>
+
 </html>

@@ -3,20 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signup Page</title>
+    <title>호구조사 Signup Page</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         function signup() {
             var id = document.getElementById("id").value;
             var password = document.getElementById("password").value;
+            var name = document.getElementById("name").value;
+            var location = document.getElementById("location").value;
+            var birthday = document.getElementById("birthday").value;
+            var motivation = document.getElementById("motivation").value;
+            var interests = document.getElementById("interests").value;
+            var mbti = document.getElementById("mbti").value;
+            var major = document.getElementById("major").value;
+            var baekjoon_rank = document.getElementById("baekjoon_rank").value;
+            var relationship_status = document.getElementById("relationship_status").value;
+            var pet_status = document.getElementById("pet_status").value;
+            var hobbies = document.getElementById("hobbies").value;
+
             console.log("ID:", id);
             console.log("Password:", password);
+
+            if (id === "" || password === "" || name === "" || motivation === "" || relationship_status === "" || pet_status === "") {
+                alert("필수 항목을 모두 작성해 주세요");
+                return;
+            }
 
             $.ajax({
                 type: "POST",
                 url: "http://localhost:5001/signup",
                 contentType: "application/json",
-                data: JSON.stringify({ id: id, password: password }),
+                data: JSON.stringify({ id: id, 
+                    password: password, 
+                    name: name, 
+                    location: location, 
+                    birthday: birthday, 
+                    motivation: motivation, 
+                    interests: interests, 
+                    mbti: mbti, 
+                    major: major, 
+                    baekjoon_rank: baekjoon_rank, 
+                    relationship_status: relationship_status, 
+                    pet_status: pet_status, 
+                    hobbies: hobbies
+                }),
                 success: function (response) {
                     console.log("Signup successful");
                     // 회원가입 성공 시 추가 동작 수행
@@ -27,9 +57,11 @@
                 }
             });
         }
+        function cancel() {
+            window.location.href = "/"; 
+        }
     </script>
     <style>
-        /* Adjusted CSS styles */
         body {
             font-family: Arial, sans-serif;
             background-color: #f2f2f2;
@@ -57,7 +89,7 @@
         }
         input[type="text"],
         input[type="password"],
-        input[type="file"],
+        input[type="file"], 
         textarea,
         select {
             width: 100%;
@@ -69,7 +101,7 @@
             box-sizing: border-box;
         }
         button {
-            width: 100%;
+            width: 45%; 
             background-color: #4caf50;
             color: white;
             padding: 14px 20px;
@@ -77,6 +109,11 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            float: left; 
+        }
+        button.cancel {
+            background-color: #dc3545;
+            float: right; 
         }
         button:hover {
             background-color: #45a049;
@@ -93,27 +130,30 @@
 </head>
 <body>
     <h1>호구조사 Signup Page</h1>
-    <h3 style="text-align: center;">빨간색으로 표시한 부분은 반드시 작성해 주세요</h3>
+    <h3 style="text-align: center;">🌟별표 표시한 부분은 반드시 작성해 주세요</h3>
+    <p style="text-align: center;">이미 회원이신가요? <a href="/">로그인</a></p>
+
     <form>
-        <label for="id" style="color: red;">ID:</label><br>
+        <label for="id">🌟ID:</label><br>
         <input type="text" id="id" name="id" required><br>
     
-        <label for="password" style="color: red;">Password:</label><br>
+        <label for="password">🌟Password:</label><br>
         <input type="password" id="password" name="password" required><br>
     
-        <label for="image" style="color: red;">이미지 첨부:</label><br>
+        <!-- <label for="image">🌟이미지 첨부:</label><br>
         <input type="file" id="image" name="image"><br>
-    
-        <label for="name" style="color: red;">이름:</label><br>
+     -->
+        <label for="name">🌟이름:</label><br>
         <input type="text" id="name" name="name" required><br>
+
         <label for="location">사는 지역:</label><br>
         <input type="text" id="location" name="location"><br>
     
         <label for="birthday">생일:</label><br>
         <input type="date" id="birthday" name="birthday"><br>
     
-        <label for="motivation" style="color: red;">지원 동기:</label><br>
-        <textarea id="motivation" name="motivation" rows="4" cols="50" required></textarea><br>
+        <label for="motivation">🌟지원 동기:</label><br>
+        <textarea id="motivation" name="motivation" rows="4" cols="50" required></textarea><br> 
     
         <label for="interests">관심 분야:</label><br>
         <input type="text" id="interests" name="interests"><br>
@@ -124,21 +164,17 @@
         <label for="major">전공:</label><br>
         <input type="text" id="major" name="major"><br>
     
-        <label for="birth_year">태어난 해:</label><br>
-        <input type="text" id="birth_year" name="birth_year"><br>
-    
         <label for="baekjoon_rank">백준 랭킹:</label><br>
         <input type="text" id="baekjoon_rank" name="baekjoon_rank"><br>
     
-        <label for="relationship_status">애인 유무:</label><br>
+        <label for="relationship_status">🌟애인 유무:</label><br>
         <select id="relationship_status" name="relationship_status">
             <option value="single">싱글</option>
             <option value="in_a_relationship">커플</option>
-            <option value="complicated">복잡한 관계ㅎ</option>
         </select><br>
     
-        <label for="relationship_status">반려동물 유무:</label><br>
-        <select id="relationship_status" name="relationship_status">
+        <label for="pet_status">🌟반려동물 유무:</label><br>
+        <select id="pet_status" name="pet_status">
             <option value="have_pet">Yes</option>
             <option value="do_not_have_pet">No</option>
         </select><br>
@@ -147,7 +183,9 @@
         <input type="text" id="hobbies" name="hobbies"><br>
     
         <button type="button" onclick="signup()">회원가입</button>
+        <button class="cancel" type="button" onclick="cancel()">취소</button>
+        
     </form>
-    <p>이미 회원이신가요? <a href="/">로그인</a></p>
+    
 </body>
 </html>

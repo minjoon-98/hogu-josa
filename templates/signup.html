@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup Page</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function signup() {
+            var id = document.getElementById("id").value;
+            var password = document.getElementById("password").value;
+            console.log("ID:", id);
+            console.log("Password:", password);
+
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:5001/signup",
+                contentType: "application/json",
+                data: JSON.stringify({ id: id, password: password }),
+                success: function (response) {
+                    console.log("Signup successful");
+                    // 회원가입 성공 시 추가 동작 수행
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error:", error);
+                    // 에러 처리
+                }
+            });
+        }
+    </script>
+    <style>
+        /* Adjusted CSS styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            color: #333;
+        }
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="file"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            background-color: #4caf50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        p {
+            text-align: center;
+            margin-top: 20px;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>호구조사 Signup Page</h1>
+    <h3 style="text-align: center;">빨간색으로 표시한 부분은 반드시 작성해 주세요</h3>
+    <form>
+        <label for="id" style="color: red;">ID:</label><br>
+        <input type="text" id="id" name="id" required><br>
+    
+        <label for="password" style="color: red;">Password:</label><br>
+        <input type="password" id="password" name="password" required><br>
+    
+        <label for="image" style="color: red;">이미지 첨부:</label><br>
+        <input type="file" id="image" name="image"><br>
+    
+        <label for="name" style="color: red;">이름:</label><br>
+        <input type="text" id="name" name="name" required><br>
+        <label for="location">사는 지역:</label><br>
+        <input type="text" id="location" name="location"><br>
+    
+        <label for="birthday">생일:</label><br>
+        <input type="date" id="birthday" name="birthday"><br>
+    
+        <label for="motivation" style="color: red;">지원 동기:</label><br>
+        <textarea id="motivation" name="motivation" rows="4" cols="50" required></textarea><br>
+    
+        <label for="interests">관심 분야:</label><br>
+        <input type="text" id="interests" name="interests"><br>
+    
+        <label for="mbti">MBTI:</label><br>
+        <input type="text" id="mbti" name="mbti"><br>
+    
+        <label for="major">전공:</label><br>
+        <input type="text" id="major" name="major"><br>
+    
+        <label for="birth_year">태어난 해:</label><br>
+        <input type="text" id="birth_year" name="birth_year"><br>
+    
+        <label for="baekjoon_rank">백준 랭킹:</label><br>
+        <input type="text" id="baekjoon_rank" name="baekjoon_rank"><br>
+    
+        <label for="relationship_status">애인 유무:</label><br>
+        <select id="relationship_status" name="relationship_status">
+            <option value="single">싱글</option>
+            <option value="in_a_relationship">커플</option>
+            <option value="complicated">복잡한 관계ㅎ</option>
+        </select><br>
+    
+        <label for="relationship_status">반려동물 유무:</label><br>
+        <select id="relationship_status" name="relationship_status">
+            <option value="have_pet">Yes</option>
+            <option value="do_not_have_pet">No</option>
+        </select><br>
+    
+        <label for="hobbies">취미:</label><br>
+        <input type="text" id="hobbies" name="hobbies"><br>
+    
+        <button type="button" onclick="signup()">회원가입</button>
+    </form>
+    <p>이미 회원이신가요? <a href="/">로그인</a></p>
+</body>
+</html>

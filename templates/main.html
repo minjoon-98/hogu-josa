@@ -52,7 +52,9 @@
 <div class="columns is-mobile">
     <div class="column is-4 is-offset-8">
             <a href="/mypage"><button class="button is-success is-inverted">내 정보 수정</button></a>
+            <button class="button is-danger is-inverted" onclick="signOut()">Sign Out</button>
     </div>
+
 </div>
 <div class="container" id="card-list" onwheel="scrollHorizontally(event)">
 </div>
@@ -94,6 +96,12 @@ $(document).ready(function() {
     });
 });
 
+function signOut(){
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    window.location.href = "/login";
+
+}
 function addCardInfo(users) {
     for (let i = 0; i < users.length; i++) {
         let user = users[i];

@@ -15,9 +15,8 @@
         margin-top: 20px;
     }
     .container {
-        width: 80%;
-        margin: 50px auto;
-        overflow-x: auto;
+        width: 100%; /* 변경: 전체 너비로 설정 */
+        overflow-x: auto; /* 변경: 가로 스크롤 추가 */
         white-space: nowrap;
         text-align: center;
     }
@@ -41,75 +40,56 @@
 </style>
 </head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script>
-    $(document).ready(function() {
-        // 이 부분에서 로그인 여부를 확인하고, 필요한 경우 토큰을 업데이트하도록 수정할 수 있습니다.
-        var access_token = localStorage.getItem('access_token');
-        if (!access_token) {
-            // 로그인이 필요한 경우, 로그인 페이지로 리다이렉트하거나 다른 작업을 수행할 수 있습니다.
-            window.location.href = "/"; // 로그인 페이지로 리다이렉트
-        } else {
-            // 액세스 토큰을 헤더에 추가
-            $.ajaxSetup({
-                headers: {
-                    'Authorization': 'Bearer ' + access_token
-                }
-            });
-    
-            // 사용자 정보 가져오기
-            $.get("/users", function(users) {
-                addCardInfo(users);
-            }).fail(function(xhr) {
-                if (xhr.status == 401) {
-                    // 토큰 만료 등의 이유로 인증되지 않은 경우, 리프레시 토큰을 사용하여 토큰을 갱신할 수 있습니다.
-                    refreshAccessToken();
-                } else {
-                    // 다른 오류 처리
-                    $('#card-list').html('<p>오류가 발생했습니다. 다시 시도해주세요.</p>');
-                }
-            });
-        }
-    });
-    
-    function refreshAccessToken() {
-        var refresh_token = localStorage.getItem('refresh_token');
-    
-        $.ajax({
-            type: "POST",
-            url: "http://localhost:5001/refresh",
-            contentType: "application/json",
-            headers: {
-                'Authorization': 'Bearer ' + refresh_token
-            },
-            success: function (response) {
-                localStorage.setItem('access_token', response.access_token); // 새로운 access_token을 로컬 스토리지에 저장
-                console.log("Access token refreshed successfully");
-                // 새로운 access_token을 받아온 후 다시 사용자 정보를 가져오는 등의 동작 수행
-                $.get("/users", function(users) {
-                    addCardInfo(users);
-                }).fail(function(xhr) {
-                    // 오류 처리
-                });
-            },
-            error: function (xhr, status, error) {
-                console.error("Error:", error);
-                // 에러 처리
-            }
-        });
-    }
-</script>
-    
+<body>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand">
+                <a class="navbar-item" href="https://jungle.krafton.com/">
+                    <img src="https://jungle.krafton.com/resource/images/common/logo.svg" alt="Krfton Jungle Logo" width="112" height="28">
+                </a>
+            </div>
+        </nav>
+    <h1 class="title is-1">호구조사</h1>
+<div class="columns is-mobile">
+    <div class="column is-4 is-offset-8">
+            <a href="/mypage"><button class="button is-success is-inverted">내 정보 수정</button></a>
+    </div>
+</div>
+<div class="container" id="card-list" onwheel="scrollHorizontally(event)">
+</div>
+<!-- 모달 -->
+<div class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title"></p>
+            <button class="delete" aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+            <div id="cardDetails">
+            </div>
+        </section>
+        <footer class="modal-card-foot">
+        </footer>
+    </div>
+</div>
 <script>
 $(document).ready(function() {
-    $.get("/users", function(users) {
-        addCardInfo(users);
-    }).fail(function(xhr) {
-        if (xhr.status == 401) {
-            // Unauthorized error
-            $('#card-list').html('<p>인증되지 않았습니다. 로그인 후 다시 시도해주세요.</p>');
-        } else {
-            // Other errors
-            $('#card-list').html('<p>오류가 발생했습니다. 다시 시도해주세요.</p>');
+    // 로컬 스토리지에서 액세스 토큰을 가져옴
+    var accessToken = localStorage.getItem('access_token');
+    console.log('accessToken:'+accessToken);
+    // 액세스 토큰을 헤더에 포함하여 사용자 정보를 가져오는 요청을 보냄
+    $.ajax({
+        url: "/users",
+        method: "GET",
+        headers: {
+            "Authorization": "Bearer " + accessToken
+        },
+        success: function(users) {
+            addCardInfo(users);
+        },
+        error: function(xhr, status, error) {
+            console.error("Error fetching users:", error);
+            // 에러 처리
         }
     });
 });
@@ -117,60 +97,79 @@ $(document).ready(function() {
 function addCardInfo(users) {
     for (let i = 0; i < users.length; i++) {
         let user = users[i];
-        let name = user.name;
-        let motivation = user.motivation;
+        let name = user['name'];
+        let location = user['location'];
+        let birthday = user['birthday'];
+        let motivation = user['motivation'];
+        let interests = user['interests'];
+        let mbti = user['mbti'];
+        let major = user['major'];
+        let baekjoon_rank = user['baekjoon_rank'];
+        let relationship_status = user['relationship_status'];
+        let pet_status = user['pet_status'];
+        let hobbies = user['hobbies'];
         let cardContentHtml = `
-            <div class="card" onclick="showCardInfo('${name}')">
-                <div class="card-content">
-                    <div class="media">
-                        <div class="media-content">
-                            <p class="title is-5">${name}</p>
-                        </div>
-                    </div>
-                    <div class="content">
-                        <p class="subtitle is-6">${motivation}</p>
-                    </div>
-                </div>
+          <div class="card" onclick="showCardInfo('${name}', '${location}', '${birthday}', '${motivation}', '${interests}', '${mbti}', '${major}', '${baekjoon_rank}', '${relationship_status}', '${pet_status}', '${hobbies}')">
+            <div class="card-image">
+                <figure class="image is-1by1">
+                    <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image">
+                </figure>
+            <div class="media">
+              <div class="media-content">
+                <p class="title is-5">${name}</p>
+              </div>
             </div>
+            <div class="content">
+              <p class="subtitle is-6">${motivation}</p>
+            </div>
+          </div>
         `;
         $('#card-list').append(cardContentHtml);
     }
 }
-
-function showCardInfo(cardName) {
+function showCardInfo(name, location, birthday, motivation, interests, mbti, major, baekjoon_rank, relationship_status, pet_status, hobbies) {
+    // 모달 창을 가져옴
     var showModal = document.querySelector('.modal');
+    // 모달 창의 제목을 설정
+    showModal.querySelector('.modal-card-title').textContent = name + '의 상세 정보';
+    // 모달 창의 내용을 가져옴
     var cardDetails = document.getElementById('cardDetails');
-    cardDetails.innerHTML = '<p>' + cardName + '의 상세 정보를 여기에 표시합니다.</p>';
+    // 카드 정보를 설정
+    cardDetails.innerHTML = `
+        <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image">
+        <p class="subtitle is-6">${name}</p>
+        <p class="subtitle is-6">${location}</p>
+        <p class="subtitle is-6">${birthday}</p>
+        <p class="subtitle is-6">${motivation}</p>
+        <p class="subtitle is-6">${interests}</p>
+        <p class="subtitle is-6">${mbti}</p>
+        <p class="subtitle is-6">${major}</p>
+        <p class="subtitle is-6">${baekjoon_rank}</p>
+        <p class="subtitle is-6">${relationship_status}</p>
+        <p class="subtitle is-6">${pet_status}</p>
+        <p class="subtitle is-6">${hobbies}</p>
+    `;
+    // 모달 창을 보이게 함
     showModal.classList.add('is-active');
 }
-
-function closeModal() {
-    var closeModal = document.querySelector(".modal");
-    closeModal.classList.remove('is-active');
-}
-
-var hideModal = document.querySelector('.modal');
-hideModal.addEventListener("click", e => {
-    if (e.target.classList.contains("modal-background")) {
-        closeModal();
-    }
+// 모달 창 닫기 버튼 및 모달 외부 클릭 시 닫기
+document.addEventListener('DOMContentLoaded', function () {
+    var modals = Array.prototype.slice.call(document.querySelectorAll('.modal'), 0);
+    var modalButtons = Array.prototype.slice.call(document.querySelectorAll('.modal .delete, .modal-background'), 0);
+    modalButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            modals.forEach(function (modal) {
+                modal.classList.remove('is-active');
+            });
+        });
+    });
 });
+// 가로 스크롤 함수
+function scrollHorizontally(e) {
+    e.preventDefault();
+    var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+    document.getElementById('card-list').scrollLeft -= (delta * 40); // 40은 스크롤 속도 조절
+}
 </script>
-<body>
-    <nav class="navbar" role="navigation" aria-label="main navigation">
-        <div class="navbar-brand">
-            <a class="navbar-item" href="https://jungle.krafton.com/">
-                <img src="https://jungle.krafton.com/resource/images/common/logo.svg" alt="Krfton Jungle Logo" width="112" height="28">
-            </a>
-        </div>
-    </nav>
-    <h1 class="title is-1">호구조사</h1>
-    <div class="columns is-mobile">
-        <div class="column is-4 is-offset-8">
-            <a href="/mypage"><button class="button is-success is-inverted">내 정보 수정</button></a>
-        </div>
-    </div>
-    <div class="container" id="card-list">
-    </div>
 </body>
 </html>

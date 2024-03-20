@@ -24,11 +24,19 @@ def is_token_valid(token):
         return True
     except Exception as e:
         return False
-    return False
 
-@app.route('/test')
-def test():
-    return jsonify({"data": request.headers.get('Authorization')})
+
+@app.route('/delete_account', methods=['DELETE'])
+@jwt_required()
+def delete_account():
+    current_user = get_jwt_identity() # 현재 로그인 사용자 id
+    res = users_collection.delete_one({'id': current_user})
+
+    if res.deleted_count == 1:
+        return jsonify({'message': '계정 삭제 완료'}), 200
+    else:
+        return jsonify({'message': '사용자 정보를 찾을 수 없습니다.'}), 400
+
 
 @app.route('/')
 def index():
@@ -37,13 +45,16 @@ def index():
     return render_template('login.html')
 
 @app.route('/main')
-@jwt_required()
 def main_page():
     return render_template('main.html')
 
 @app.route('/signup')
 def signup_page():
     return render_template('signup.html')
+
+@app.route('/mypage')
+def mypage():
+    return render_template('mypage.html')
 
 #회원가입 엔드포인트
 @app.route('/signup', methods=['POST'])
@@ -124,6 +135,28 @@ def login():
 def get_users():
     users = list(users_collection.find({}, {'_id': 0}))  # 모든 사용자 정보를 가져옴
     return jsonify(users), 200
+
+# 사용자 정보를 업데이트
+@app.route('/update', methods=['PUT'])
+@jwt_required() # JWT 토큰이 필요한 엔드포인트
+def update_user():
+    current_user = get_jwt_identity()   # 현재 로그인한 사용자의 ID
+    data = request.json # 클라이언트로부터 전달받은 JSON 데이터
+
+    existing_user = users_collection.find_one({'id': current_user})
+    
+    if existing_user:
+        for key, value in data.items():
+            existing_user[key] = value
+
+        users_collection.update_one({'id': current_user}, {'$set': existing_user})
+        return jsonify({'message': '사용자 정보 업데이트 완료'}), 200
+    else:
+        return jsonify({'message': '사용자 정보를 찾을 수 없습니다.'}), 404
+
+
+    
+
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5001, debug=True)

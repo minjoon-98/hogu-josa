@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>호구조사 마이페이지</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        // 페이지가 로드될 때 실행되는 함수
+        $(document).ready(function() {
+            // 사용자 정보를 업데이트하는 함수
+            function updateUserInfo() {
+                var name = document.getElementById("name").value;
+                var location = document.getElementById("location").value;
+                var birthday = document.getElementById("birthday").value;
+                var motivation = document.getElementById("motivation").value;
+                var interests = document.getElementById("interests").value;
+                var mbti = document.getElementById("mbti").value;
+                var major = document.getElementById("major").value;
+                var baekjoon_rank = document.getElementById("baekjoon_rank").value;
+                var relationship_status = document.getElementById("relationship_status").value;
+                var pet_status = document.getElementById("pet_status").value;
+                var hobbies = document.getElementById("hobbies").value;
+
+                // localStorage에서 access_token 가져오기
+                var accessToken = localStorage.getItem('access_token');
+                console.log('accessToken:'+accessToken);
+
+                // 서버에 사용자 정보 업데이트 요청을 보내는 Ajax 요청
+                $.ajax({
+                    type: "PUT",
+                    url: "http://localhost:5001/update",
+                    headers: {
+                        'Authorization': 'Bearer ' + accessToken // 헤더에 access_token 추가
+                    },
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        name: name,
+                        location: location,
+                        birthday: birthday,
+                        motivation: motivation,
+                        interests: interests,
+                        mbti: mbti,
+                        major: major,
+                        baekjoon_rank: baekjoon_rank,
+                        relationship_status: relationship_status,
+                        pet_status: pet_status,
+                        hobbies: hobbies
+                    }),
+                    success: function(response) {
+                        console.log("User info updated successfully");
+                        alert("사용자 정보가 업데이트되었습니다.");
+                        window.location.href = "/main";
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error:", error);
+                        alert(xhr.responseJSON.message);
+                    }
+                });
+            }
+
+            function deleteAccount(){
+                var accessToken = localStorage.getItem('access_token');
+
+                $.ajax({
+                    type: "DELETE",
+                    url: "http://localhost:5001/delete_account",
+                    headers: {
+                        'Authorization': 'Bearer ' + accessToken
+                    },
+                    success: function(response){
+                        console.log("delete account successfully");
+                        alert("계정이 삭제되었습니다.");
+                        window.location.href = "/login";
+                    },
+                    error: function(xhr, status, error){
+                        console.error("Error:", error);
+                        alert(xhr.responseJSON.message);
+                    }
+                });
+            }
+            
+            // '정보 업데이트' 버튼 클릭 시 사용자 정보 업데이트 함수 호출
+            $("#updateBtn").click(function() {
+                updateUserInfo();
+            });
+
+            $("#deleteBtn").click(function() {
+                if(confirm("정말로 계정을 삭제하시겠습니까?")){
+                    deleteAccount();
+                }
+            });
+        });
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            color: #333;
+        }
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="file"], 
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 45%; 
+            background-color: #4caf50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            float: left; 
+        }
+        button.cancel {
+            background-color: #dc3545;
+            float: right; 
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        p {
+            text-align: center;
+            margin-top: 20px;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>호구조사 Signup Page</h1>
+    <h3 style="text-align: center;">여기서 회원정보를 수정할 수 있습니다.</h3>
+    <form>
+        <label for="id">🌟ID:</label><br>
+        <input type="text" id="id" name="id" required><br>
+    
+        <label for="password">🌟Password:</label><br>
+        <input type="password" id="password" name="password" required><br>
+    
+        <!-- <label for="image">🌟이미지 첨부:</label><br>
+        <input type="file" id="image" name="image"><br>
+     -->
+        <label for="name">🌟이름:</label><br>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="location">사는 지역:</label><br>
+        <input type="text" id="location" name="location"><br>
+    
+        <label for="birthday">생일:</label><br>
+        <input type="date" id="birthday" name="birthday"><br>
+    
+        <label for="motivation">🌟지원 동기:</label><br>
+        <textarea id="motivation" name="motivation" rows="4" cols="50" required></textarea><br> 
+    
+        <label for="interests">관심 분야:</label><br>
+        <input type="text" id="interests" name="interests"><br>
+    
+        <label for="mbti">MBTI:</label><br>
+        <input type="text" id="mbti" name="mbti"><br>
+    
+        <label for="major">전공:</label><br>
+        <input type="text" id="major" name="major"><br>
+    
+        <label for="baekjoon_rank">백준 랭킹:</label><br>
+        <input type="text" id="baekjoon_rank" name="baekjoon_rank"><br>
+    
+        <label for="relationship_status">🌟애인 유무:</label><br>
+        <select id="relationship_status" name="relationship_status">
+            <option value="single">싱글</option>
+            <option value="in_a_relationship">커플</option>
+        </select><br>
+    
+        <label for="pet_status">🌟반려동물 유무:</label><br>
+        <select id="pet_status" name="pet_status">
+            <option value="have_pet">Yes</option>
+            <option value="do_not_have_pet">No</option>
+        </select><br>
+    
+        <label for="hobbies">취미:</label><br>
+        <input type="text" id="hobbies" name="hobbies"><br>
+    
+         <button id="updateBtn" type="button">정보 업데이트</button>
+        
+         <button id="deleteBtn" class="cancel" type="button">계정 삭제</button>
+        
+    </form>
+    
+</body>
+</html>

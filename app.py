@@ -40,8 +40,6 @@ def delete_account():
 
 @app.route('/')
 def index():
-    if is_token_valid(request.headers.get('Authorization')):
-        return render_template('/main.html')
     return render_template('login.html')
 
 @app.route('/main')

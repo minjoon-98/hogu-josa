@@ -57,29 +57,32 @@ def mypage():
 #회원가입 엔드포인트
 @app.route('/signup', methods=['POST'])
 def signup():
-    data = request.json # 클라이언트로부터 전달받은 JSON 데이터
-    id = data.get('id')
-    password = data.get('password')
-    name = data.get('name')
-    location = data.get('location')
-    birthday = data.get('birthday')
-    motivation = data.get('motivation')
-    interests = data.get('interests')
-    mbti = data.get('mbti')
-    major = data.get('major')
-    baekjoon_rank = data.get('baekjoon_rank')
-    relationship_status = data.get('relationship_status')
-    pet_status = data.get('pet_status')
-    hobbies = data.get('hobbies')
-    
+    data = request.json # 클라이언트로부터 전달받은 폼 데이터
 
+    # 'id' 필드가 전송되었는지 확인
+    if 'id' not in data:
+        return jsonify({'message': '아이디를 입력해주세요.'}), 400
 
-    #이미 등록된 사용자인지 확인
+    id = data['id']
+    password = data['password']
+    name = data['name']
+    location = data['location']
+    birthday = data['birthday']
+    motivation = data['motivation']
+    interests = data['interests']
+    mbti = data['mbti']
+    major = data['major']
+    baekjoon_rank = data['baekjoon_rank']
+    relationship_status = data['relationship_status']
+    pet_status = data['pet_status']
+    hobbies = data['hobbies']
+
+    # 이미 등록된 사용자인지 확인
     existing_user = users_collection.find_one({'id': id})
     if existing_user:
         return jsonify({'message': '이미 등록된 사용자입니다.'}), 400
     
-    #사용자 정보 mongoDB에 저장.
+    # 사용자 정보 MongoDB에 저장
     user_data = {
         'id': id,
         'password': password,
@@ -96,7 +99,6 @@ def signup():
         'hobbies': hobbies
     }
     users_collection.insert_one(user_data)
-    
     return jsonify({'message': '회원가입 완료'}), 200
 
 @app.route('/refresh', methods=['POST'])
@@ -123,6 +125,7 @@ def login():
 
         # 리프레시 토큰 저장
         refresh_tokens_collection.insert_one({'refresh_token': refresh_token})
+        
 
         return jsonify({'access_token': access_token, 'refresh_token':refresh_token}), 200
     else:
@@ -152,9 +155,43 @@ def update_user():
     else:
         return jsonify({'message': '사용자 정보를 찾을 수 없습니다.'}), 404
 
+# 사용자 정보를 찾는 엔드포인트
+@app.route('/find', methods=['POST'])
+@jwt_required() # JWT 토큰이 필요한 엔드포인트
+def find_user():
+    current_user = get_jwt_identity()
+    currUser = users_collection.find_one({'id': current_user}, {'_id': 0})
+    if currUser:
+        for _ in currUser.items():
+            # print(currUser.items())
+            currUser_name = currUser['name']
+            currUser_id = currUser['id']
+            currUser_location = currUser['location']
+            currUser_birthday = currUser['birthday']
+            currUser_motivation = currUser['motivation']
+            currUser_interests = currUser['interests']
+            currUser_mbti = currUser['mbti']
+            currUser_major = currUser['major']
+            currUser_baekjoon_rank = currUser['baekjoon_rank']
+            currUser_relationship_status = currUser['relationship_status']
+            currUser_pet_status = currUser['pet_status']
+            currUser_hobbies = currUser['hobbies']
 
-    
 
+            return jsonify({'name': currUser_name, 
+                            'id': currUser_id, 
+                            'location': currUser_location, 
+                            'birthday': currUser_birthday, 
+                            'motivation': currUser_motivation, 
+                            'interests': currUser_interests, 
+                            'mbti': currUser_mbti, 
+                            'major': currUser_major, 
+                            'baekjoon_rank': currUser_baekjoon_rank, 
+                            'relationship_status': currUser_relationship_status, 
+                            'pet_status': currUser_pet_status, 
+                            'hobbies': currUser_hobbies}), 200
+    else:
+        return jsonify({'message': '사용자 정보를 찾을 수 없습니다.'}), 404
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5001, debug=True)

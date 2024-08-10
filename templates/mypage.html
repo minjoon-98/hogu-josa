@@ -1,15 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>호구조사 마이페이지</title>
+    <title>호구조사 MyPage</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         // 페이지가 로드될 때 실행되는 함수
-        $(document).ready(function() {
+        $(document).ready(function () {
+            // 사용자 정보를 다시 요청하여 가져옴
+            var accessToken = localStorage.getItem('access_token');
+            console.log('accessToken:' + accessToken);
+            // 사용자 정보를 가져오는 요청을 보냄
+            $.ajax({
+                url: "/find",
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + accessToken
+                },
+                success: function (currUser) {
+                    console.log("User info:", currUser);
+                    // 사용자 정보를 가져온 후, 각 필드에 값을 채워넣음
+                    document.getElementById("id").value = currUser.id;
+                    document.getElementById("name").value = currUser.name;
+                    document.getElementById("location").value = currUser.location;
+                    document.getElementById("birthday").value = currUser.birthday;
+                    document.getElementById("motivation").value = currUser.motivation;
+                    document.getElementById("interests").value = currUser.interests;
+                    document.getElementById("mbti").value = currUser.mbti;
+                    document.getElementById("major").value = currUser.major;
+                    document.getElementById("baekjoon_rank").value = currUser.baekjoon_rank;
+                    document.getElementById("relationship_status").value = currUser.relationship_status;
+                    document.getElementById("pet_status").value = currUser.pet_status;
+                    document.getElementById("hobbies").value = currUser.hobbies;
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error:", error);
+                    alert(xhr.responseJSON.message);
+                }
+            });
             // 사용자 정보를 업데이트하는 함수
             function updateUserInfo() {
+                var id = document.getElementById("id").value;
+                var password = document.getElementById("password").value;
                 var name = document.getElementById("name").value;
                 var location = document.getElementById("location").value;
                 var birthday = document.getElementById("birthday").value;
@@ -22,9 +57,15 @@
                 var pet_status = document.getElementById("pet_status").value;
                 var hobbies = document.getElementById("hobbies").value;
 
+                // 필수 항목인지 검증
+                if (id === "" || password === "" || name === "" || motivation === "" || relationship_status === "" || pet_status === "") {
+                    alert("ID, Password, 이름, 동기, 관계 상태, 애완동물 상태는 필수 입력 항목입니다.");
+                    return;
+                }
+
                 // localStorage에서 access_token 가져오기
                 var accessToken = localStorage.getItem('access_token');
-                console.log('accessToken:'+accessToken);
+                console.log('accessToken:' + accessToken);
 
                 // 서버에 사용자 정보 업데이트 요청을 보내는 Ajax 요청
                 $.ajax({
@@ -47,19 +88,19 @@
                         pet_status: pet_status,
                         hobbies: hobbies
                     }),
-                    success: function(response) {
+                    success: function (response) {
                         console.log("User info updated successfully");
                         alert("사용자 정보가 업데이트되었습니다.");
                         window.location.href = "/main";
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.error("Error:", error);
                         alert(xhr.responseJSON.message);
                     }
                 });
             }
 
-            function deleteAccount(){
+            function deleteAccount() {
                 var accessToken = localStorage.getItem('access_token');
 
                 $.ajax({
@@ -68,25 +109,25 @@
                     headers: {
                         'Authorization': 'Bearer ' + accessToken
                     },
-                    success: function(response){
+                    success: function (response) {
                         console.log("delete account successfully");
                         alert("계정이 삭제되었습니다.");
                         window.location.href = "/";
                     },
-                    error: function(xhr, status, error){
+                    error: function (xhr, status, error) {
                         console.error("Error:", error);
                         alert(xhr.responseJSON.message);
                     }
                 });
             }
-            
+
             // '정보 업데이트' 버튼 클릭 시 사용자 정보 업데이트 함수 호출
-            $("#updateBtn").click(function() {
+            $("#updateBtn").click(function () {
                 updateUserInfo();
             });
 
-            $("#deleteBtn").click(function() {
-                if(confirm("정말로 계정을 삭제하시겠습니까?")){
+            $("#deleteBtn").click(function () {
+                if (confirm("정말로 계정을 삭제하시겠습니까?")) {
                     deleteAccount();
                 }
             });
@@ -100,11 +141,13 @@
             margin: 0;
             padding: 0;
         }
+
         h1 {
             text-align: center;
             margin-top: 20px;
             color: #333;
         }
+
         form {
             max-width: 600px;
             margin: 0 auto;
@@ -113,14 +156,16 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         label {
             display: block;
             font-weight: bold;
             margin-top: 10px;
         }
+
         input[type="text"],
         input[type="password"],
-        input[type="file"], 
+        input[type="file"],
         textarea,
         select {
             width: 100%;
@@ -131,91 +176,114 @@
             border-radius: 4px;
             box-sizing: border-box;
         }
+
         button {
-            width: 45%; 
-            background-color: #4caf50;
-            color: white;
-            padding: 14px 20px;
-            margin: 8px 0;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            float: left; 
+            text-align: center;
         }
-        button.cancel {
-            background-color: #dc3545;
-            float: right; 
-        }
-        button:hover {
-            background-color: #45a049;
-        }
+
         p {
             text-align: center;
             margin-top: 20px;
         }
+
         a {
             color: #007bff;
             text-decoration: none;
         }
     </style>
 </head>
-<body>
-    <h1>호구조사 Signup Page</h1>
-    <h3 style="text-align: center;">여기서 회원정보를 수정할 수 있습니다.</h3>
-    <form>
-        <label for="id">🌟ID:</label><br>
-        <input type="text" id="id" name="id" required><br>
-    
-        <label for="password">🌟Password:</label><br>
-        <input type="password" id="password" name="password" required><br>
-    
-        <!-- <label for="image">🌟이미지 첨부:</label><br>
-        <input type="file" id="image" name="image"><br>
-     -->
-        <label for="name">🌟이름:</label><br>
-        <input type="text" id="name" name="name" required><br>
 
-        <label for="location">사는 지역:</label><br>
-        <input type="text" id="location" name="location"><br>
-    
-        <label for="birthday">생일:</label><br>
-        <input type="date" id="birthday" name="birthday"><br>
-    
-        <label for="motivation">🌟지원 동기:</label><br>
-        <textarea id="motivation" name="motivation" rows="4" cols="50" required></textarea><br> 
-    
-        <label for="interests">관심 분야:</label><br>
-        <input type="text" id="interests" name="interests"><br>
-    
-        <label for="mbti">MBTI:</label><br>
-        <input type="text" id="mbti" name="mbti"><br>
-    
-        <label for="major">전공:</label><br>
-        <input type="text" id="major" name="major"><br>
-    
-        <label for="baekjoon_rank">백준 랭킹:</label><br>
-        <input type="text" id="baekjoon_rank" name="baekjoon_rank"><br>
-    
-        <label for="relationship_status">🌟애인 유무:</label><br>
-        <select id="relationship_status" name="relationship_status">
-            <option value="single">싱글</option>
-            <option value="in_a_relationship">커플</option>
-        </select><br>
-    
-        <label for="pet_status">🌟반려동물 유무:</label><br>
-        <select id="pet_status" name="pet_status">
-            <option value="have_pet">Yes</option>
-            <option value="do_not_have_pet">No</option>
-        </select><br>
-    
-        <label for="hobbies">취미:</label><br>
-        <input type="text" id="hobbies" name="hobbies"><br>
-    
-         <button id="updateBtn" type="button">정보 업데이트</button>
-        
-         <button id="deleteBtn" class="cancel" type="button">계정 삭제</button>
-        
+<body>
+    <h1>호구조사 MyPage</h1>
+    <h3 style="text-align: center;">🌟별표 표시한 부분은 반드시 작성해 주세요</h3>
+    <form>
+        <div class="field">
+            <label class="label">🌟ID</label>
+            <div class="control">
+                <input class="input" type="text" id="id" placeholder="ID" disabled>
+            </div>
+
+            <label class="label">🌟Password</label>
+            <div class="control">
+                <input class="input" type="password" id="password" placeholder="Password" required>
+            </div>
+
+            <label class="label">🌟이름</label>
+            <div class="control">
+                <input class="input" type="text" id="name" placeholder="이름" required>
+            </div>
+
+            <label class="label">사는 지역</label>
+            <div class="control">
+                <input class="input" type="text" id="location" placeholder="사는 지역">
+            </div>
+
+            <label class="label">생일</label>
+            <div class="control">
+                <input class="input" type="date" id="birthday" placeholder="생일">
+            </div>
+
+            <label class="label">🌟지원 동기</label>
+            <div class="control">
+                <textarea class="textarea" id="motivation" placeholder="지원 동기" required></textarea>
+            </div>
+
+            <label class="label">관심 분야</label>
+            <div class="control">
+                <input class="input" type="text" id="interests" placeholder="관심 분야">
+            </div>
+
+            <label class="label">MBTI</label>
+            <div class="control">
+                <input class="input" type="text" id="mbti" placeholder="MBTI">
+            </div>
+
+            <label class="label">전공</label>
+            <div class="control">
+                <input class="input" type="text" id="major" placeholder="전공">
+            </div>
+
+            <label class="label">백준 랭킹</label>
+            <div class="control">
+                <input class="input" type="text" id="baekjoon_rank" placeholder="백준 랭킹">
+            </div>
+
+            <label class="label">🌟애인 유무</label>
+            <div class="control">
+                <div class="select">
+                    <select id="relationship_status" placeholder="애인 유무">
+                        <option value="single">싱글</option>
+                        <option value="in_a_relationship">커플</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <label class="label">🌟반려동물 유무</label>
+            <div class="control">
+                <div class="select">
+                    <select id="pet_status" placeholder="반려동물 유무">
+                        <option value="do_not_have_pet">No</option>
+                        <option value="have_pet">Yes</option>
+                    </select>
+                </div>
+            </div>
+
+            <label class="label">취미</label>
+            <div class="control">
+                <input class="input" type="text" id="hobbies" placeholder="취미">
+            </div>
+
+            <div class="field is-grouped">
+                <div class="control">
+                    <button class="button is-link" id="updateBtn">정보 업데이트</button>
+                </div>
+                <div class="control">
+                    <button class="button is-danger" id="deleteBtn">계정 삭제</button>
+                </div>
+            </div>
+        </div>
     </form>
-    
 </body>
+
 </html>

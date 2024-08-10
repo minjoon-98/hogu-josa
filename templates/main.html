@@ -1,109 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-<title>호구조사</title>
-<style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-    }
-    h1 {
-        text-align: center;
-        margin-top: 20px;
-    }
-    .container {
-        width: 100%;
-        overflow-x: auto; /* 변경: 가로 스크롤 추가 */
-        white-space: nowrap;
-        text-align: center;
-    }
-    .card {
-        display: inline-block;
-        width: 300px;
-        height: 400px;
-        margin-right: 20px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        cursor: pointer; /* 추가: 커서를 포인터로 변경하여 클릭 가능하다는 것을 나타냄 */
-    }
-    .card:hover {
-        transform: translateY(-5px);
-    }
-    .custom-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-top: auto;
-    margin-bottom: auto;
-    text-align: center;
-}
 
-.custom-subtitle {
-    font-size: 1rem;
-    margin-top: auto;
-    margin-bottom: auto;
-    text-align: center;
-}
-    .block {
-        clear: both;
-        margin-bottom: auto;
-        padding-bottom: auto;
-    }
-</style>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script>
-    $(document).ready(function() {
-        // 사용자 정보를 가져오는 요청을 보냄
-        $.ajax({
-            url: "/users",  // 사용자 정보를 가져오는 엔드포인트 URL
-            method: "GET",
-            success: function(users) {
-                // 사용자 정보를 받아와 카드를 생성
-                addCardInfo(users);
-            },
-            error: function(xhr, status, error) {
-                console.error("Error fetching users:", error);
-                // 에러 처리
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <title>호구조사</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .container {
+            width: 100%;
+            overflow-x: auto;
+            /* 가로 스크롤 추가 */
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .card {
+            display: inline-block;
+            width: 300px;
+            height: 400px;
+            margin-right: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .custom-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: auto;
+            margin-bottom: auto;
+            text-align: center;
+        }
+
+        .custom-subtitle {
+            font-size: 1rem;
+            margin-top: auto;
+            margin-bottom: auto;
+            text-align: center;
+        }
+
+        .block {
+            clear: both;
+            margin-bottom: auto;
+            padding-bottom: auto;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // 사용자 정보를 가져오는 요청을 보냄
+            let token = localStorage.getItem('access_token');
+            if (token) {
+                $.ajax({
+                    url: "/users",
+                    method: "GET",
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    },
+                    success: function (users) {
+                        addCardInfo(users);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching users:", error);
+                    }
+                });
+            } else {
+                console.error("No access token found.");
             }
         });
-    });
 
-    // 로그아웃
-    function signOut(){
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        window.location.href = "/";
+        function signOut() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            window.location.href = "/";
+        }
 
-    }
-    // 사용자 정보를 가져오는 요청을 보냄
-    function addCardInfo(users) {
-        for (let i = 0; i < users.length; i++) {
-            let user = users[i];
-            let name = user['name'];
-            let location = user['location'];
-            let birthday = user['birthday'];
-            let motivation = user['motivation'];
-            let interests = user['interests'];
-            let mbti = user['mbti'];
-            let major = user['major'];
-            let baekjoon_rank = user['baekjoon_rank'];
-            let relationship_status = user['relationship_status'];
-            let pet_status = user['pet_status'];
-            let hobbies = user['hobbies'];
-            let filepath = user['filepath'];
+        function addCardInfo(users) {
+            for (let user of users) {
+                let { name, location, birthday, motivation, interests, mbti, major, baekjoon_rank, relationship_status, pet_status, hobbies, filepath } = user;
 
-            let cardContentHtml = `
+                let cardContentHtml = `
                 <div class="card" onclick="showCardInfo('${filepath}', '${name}', '${location}', '${birthday}', '${motivation}', '${interests}', '${mbti}', '${major}', '${baekjoon_rank}', '${relationship_status}', '${pet_status}', '${hobbies}')">
                     <div class="card-image">
                         <figure class="image is-1by1">
-                            <img src="${filepath}" alt="비공개" style="display:block; margin:0 auto; height: 280px; width:auto;">
+                            <img src="${filepath}" alt="User Image" style="display:block; margin:0 auto; height: 280px; width:auto;">
                         </figure>
                     </div>
                     <div class="media">
@@ -116,72 +116,36 @@
                     </div>
                 </div>
             `;
-            $('#card-list').append(cardContentHtml);
+                $('#card-list').append(cardContentHtml);
+            }
         }
-    }
-    function showCardInfo(filepath, name, location, birthday, motivation, interests, mbti, major, baekjoon_rank, relationship_status, pet_status, hobbies) {
-        // 모달 창을 가져옴
-        var showModal = document.querySelector('.modal');
-        // 모달 창의 제목을 설정
-        showModal.querySelector('.modal-card-title').textContent = name + '의 상세 정보';
-        // 모달 창의 내용을 가져옴
 
-        $(document).ready(function() {
-        var cardDetails = document.getElementById('cardDetails');
+        function showCardInfo(filepath, name, location, birthday, motivation, interests, mbti, major, baekjoon_rank, relationship_status, pet_status, hobbies) {
+            var showModal = document.querySelector('.modal');
+            showModal.querySelector('.modal-card-title').textContent = name + '의 상세 정보';
 
-        // 사용자 정보를 다시 요청하여 가져옴
-        var accessToken = localStorage.getItem('access_token');
-        console.log('accessToken:'+accessToken);
-        // 사용자 정보를 가져오는 요청을 보냄
-        $.ajax({
-            url: "/find",
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer " + accessToken
-            },
-            success: function(currUser) {
-                visable_name = name;
-                if (currUser['location'] === '') {
-                    var visable_location = '잠김';
-                } else {
-                    visable_location = location;
-                }
-                if (currUser['birthday'] === '') {
-                    var visable_birthday = '잠김';
-                } else {
-                    visable_birthday = birthday;
-                }
-                visable_motivation = motivation;
-                if (currUser['interests'] === '') {
-                    var visable_interests = '잠김';
-                } else {
-                    visable_interests = interests;
-                }
-                if (currUser['mbti'] === '') {
-                    var visable_mbti = '잠김';
-                } else {
-                    visable_mbti = mbti;
-                }
-                if (currUser['major'] === '') {
-                    var visable_major = '잠김';
-                } else {
-                    visable_major = major;
-                }
-                if (currUser['baekjoon_rank'] === '') {
-                    var visable_baekjoon_rank = '잠김';
-                } else {
-                    visable_baekjoon_rank = baekjoon_rank;
-                }
-                visable_relationship_status = relationship_status;
-                visable_pet_status = pet_status;
-                if (currUser['hobbies'] === '') {
-                    var visable_hobbies = '잠김';
-                } else {
-                    visable_hobbies = hobbies;
-                }
-                 // 카드 정보를 설정
-                cardDetails.innerHTML = `
-                    <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image">
+            var accessToken = localStorage.getItem('access_token');
+            $.ajax({
+                url: "/find",
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + accessToken
+                },
+                success: function (currUser) {
+                    let visable_name = name;
+                    let visable_location = currUser['location'] || '잠김';
+                    let visable_birthday = currUser['birthday'] || '잠김';
+                    let visable_motivation = motivation;
+                    let visable_interests = currUser['interests'] || '잠김';
+                    let visable_mbti = currUser['mbti'] || '잠김';
+                    let visable_major = currUser['major'] || '잠김';
+                    let visable_baekjoon_rank = currUser['baekjoon_rank'] || '잠김';
+                    let visable_relationship_status = relationship_status;
+                    let visable_pet_status = pet_status;
+                    let visable_hobbies = currUser['hobbies'] || '잠김';
+
+                    $('#cardDetails').html(`
+                    <img src="${filepath}" alt="User Image" style="display:block; margin:0 auto; height: 200px; width:auto;">
                     <div class="block">
                         <p class="custom-title">이름</p>
                         <p class="custom-subtitle">${visable_name}</p>
@@ -226,67 +190,58 @@
                         <p class="custom-title">취미</p>
                         <p class="custom-subtitle">${visable_hobbies}</p>
                     </div>
-                `;
-                // 모달 창을 보이게 함
-                showModal.classList.add('is-active');
-                console.log('Modal shown'); 
-            },
-            error: function(xhr, status, error) {
-                console.error("Error fetching users:", error);
-                // 에러 처리
-            }
-        });
-    }
-)};
+                `);
+                    showModal.classList.add('is-active');
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching user details:", error);
+                }
+            });
+        }
 
-// 모달 창 닫기 버튼 및 모달 외부 클릭 시 닫기
-document.addEventListener('DOMContentLoaded', function () {
-    var modals = Array.prototype.slice.call(document.querySelectorAll('.modal'), 0);
-    var modalButtons = Array.prototype.slice.call(document.querySelectorAll('.modal .delete, .modal-background'), 0);
-    modalButtons.forEach(function (button) {
-        button.addEventListener('click', function () {
-            modals.forEach(function (modal) {
-                modal.classList.remove('is-active');
+        document.addEventListener('DOMContentLoaded', function () {
+            var modals = Array.from(document.querySelectorAll('.modal'));
+            var modalButtons = Array.from(document.querySelectorAll('.modal .delete, .modal-background'));
+            modalButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    modals.forEach(function (modal) {
+                        modal.classList.remove('is-active');
+                    });
+                });
             });
         });
-    });
-});
-function scrollHorizontally(e) {
-    e.preventDefault();
-    var container = document.getElementById("card-list");
-    var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
-    container.scrollLeft -= (delta * 40); // 40은 스크롤 속도 조절
-    
-    // 스크롤이 오른쪽 끝에 도달했는지 확인
-    if (container.scrollLeft === (container.scrollWidth - container.clientWidth)) {
-        // 오른쪽 끝에 도달하면 전체 스크롤을 아래로 이동
-        window.scrollBy(0, 100); // 변경 가능한 값
-    }
-    
-    // 스크롤이 왼쪽 끝에 도달했는지 확인
-    if (container.scrollLeft === 0) {
-        // 왼쪽 끝에 도달하면 전체 스크롤을 위로 이동
-        window.scrollBy(0, -100); // 변경 가능한 값
-    }
-}
 
-</script>
+        function scrollHorizontally(e) {
+            e.preventDefault();
+            var container = document.getElementById("card-list");
+            var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+            container.scrollLeft -= (delta * 40); // 40은 스크롤 속도 조절
+
+            if (container.scrollLeft === (container.scrollWidth - container.clientWidth)) {
+                window.scrollBy(0, 100); // 오른쪽 끝에 도달 시 아래로 이동
+            }
+
+            if (container.scrollLeft === 0) {
+                window.scrollBy(0, -100); // 왼쪽 끝에 도달 시 위로 이동
+            }
+        }
+    </script>
 </head>
+
 <body>
     <nav class="navbar" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
             <a class="navbar-item" href="https://jungle.krafton.com/">
-                <img src="https://jungle.krafton.com/resource/images/common/logo.svg" alt="Krfton Jungle Logo" width="112" height="28">
+                <img src="https://jungle.krafton.com/resource/images/common/logo.svg" alt="Krfton Jungle Logo"
+                    width="112" height="28">
             </a>
         </div>
     </nav>
     <h1 class="title is-1">호구조사</h1>
     <div class="columns is-mobile">
         <div class="column is-4 is-offset-8">
-            <!-- 수정된 부분 -->
-                <a href="/mypage"><button class="button is-success is-inverted">내 정보 수정</button></a>
-                <button class="button is-danger is-inverted" onclick="signOut()">로그아웃</button>
-            <!-- 수정된 부분 -->
+            <a href="/mypage"><button class="button is-success is-inverted">내 정보 수정</button></a>
+            <button class="button is-danger is-inverted" onclick="signOut()">로그아웃</button>
         </div>
     </div>
     <div class="container" id="card-list" onwheel="scrollHorizontally(event)">
@@ -307,5 +262,6 @@ function scrollHorizontally(e) {
             </footer>
         </div>
     </div>
-    </body>
+</body>
+
 </html>

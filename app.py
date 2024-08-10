@@ -125,17 +125,31 @@ def login():
 
         # 리프레시 토큰 저장
         refresh_tokens_collection.insert_one({'refresh_token': refresh_token})
-        
 
-        return jsonify({'access_token': access_token, 'refresh_token':refresh_token}), 200
+        return jsonify({'access_token': access_token, 'refresh_token':refresh_token, 'current_id':id}), 200
     else:
+        # 인증 실패 시, 401 상태 코드 반환
         return jsonify({'message': '인증 실패'}), 401
     
 # 사용자 정보를 가져오는 엔드포인트
 @app.route('/users', methods=['GET'])
+@jwt_required()  # JWT 토큰이 필요한 엔드포인트
 def get_users():
-    users = list(users_collection.find({}, {'_id': 0}))  # 모든 사용자 정보를 가져옴
+    current_user = get_jwt_identity()  # 현재 로그인 사용자 ID
+
+    # 현재 로그인 사용자 정보를 가져옴
+    current_user_info = users_collection.find_one({'id': current_user}, {'_id': 0})
+    if not current_user_info:
+        return jsonify({'message': '사용자 정보를 찾을 수 없습니다.'}), 404
+
+    # 현재 로그인 사용자 정보를 제외한 나머지 사용자 정보를 가져옴
+    other_users = list(users_collection.find({'id': {'$ne': current_user}}, {'_id': 0}))
+
+    # 결과를 리스트로 결합 (로그인 사용자 정보가 가장 왼쪽)
+    users = [current_user_info] + other_users
+
     return jsonify(users), 200
+
 
 # 사용자 정보를 업데이트
 @app.route('/update', methods=['PUT'])

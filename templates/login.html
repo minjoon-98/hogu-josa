@@ -6,85 +6,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
     <link href="https://fonts.googleapis.com/css?family=Hepta+Slab:300,500" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
 
     <style>
-        /* Adjusted CSS styles */
-        /* You can remove this style block if you have linked the external CSS file correctly */
         body {
-            font-family: Hepta Slab, sans-serif;
-            font-weight: 500;
-            background: #efecdb;
-            color: #5D4037;
+            font-family: 'Hepta Slab', sans-serif;
+            background-color: #F5F5F5;
+            /* 밝은 배경색으로 변경 */
+            color: #333333;
+            /* 어두운 텍스트 색상으로 변경 */
         }
 
-        * {
-            box-sizing: border-box;
-        }
-
-        /* hide scrollbar */
-        ::-webkit-scrollbar {
-            width: 1px;
-            height: 1px;
-        }
-
-        ::-webkit-scrollbar-button {
-            width: 1px;
-            height: 1px;
-        }
-
-        .external {
-            overflow: hidden;
-            height: 100vh;
-        }
-
-        .horizontal-scroll-wrapper {
-            display: -webkit-box;
+        .login-container {
+            min-height: 100vh;
             display: flex;
-            -webkit-box-orient: vertical;
-            -webkit-box-direction: normal;
-            flex-direction: column;
-            -webkit-box-align: center;
-            align-items: center;
-            width: 100vh;
-            -webkit-transform: rotate(-90deg) translate3d(0, -100vh, 0);
-            transform: rotate(-90deg) translate3d(0, -100vh, 0);
-            -webkit-transform-origin: right top;
-            transform-origin: right top;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding: 0;
-            height: 100vw;
-            -webkit-perspective: 1px;
-            perspective: 1px;
-            -webkit-transform-style: preserve-3d;
-            transform-style: preserve-3d;
-            padding-bottom: 10rem;
-        }
-
-        .img-wrapper {
-            -webkit-transform: rotate(90deg);
-            transform: rotate(90deg);
-            display: -webkit-box;
-            display: flex;
-            -webkit-box-align: center;
-            align-items: center;
-            -webkit-box-pack: center;
             justify-content: center;
-            min-height: 40vh;
-            -webkit-transform-origin: 50% 50%;
-            transform-origin: 50% 50%;
-            -webkit-transform: rotate(90deg) translateZ(.1px) scale(0.9) translateX(0px) translateY(-3vh);
-            transform: rotate(90deg) translateZ(.1px) scale(0.9) translateX(0px) translateY(-3vh);
-            -webkit-transition: 1s;
-            transition: 1s;
+            align-items: center;
+            padding: 2rem;
         }
 
-        .img-wrapper:hover {
-            min-height: 65vh;
+        .login-box {
+            background-color: #FFFFFF;
+            /* 밝은 배경색 */
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            /* 더 부드러운 그림자 */
+            max-width: 400px;
+            width: 100%;
         }
 
-        /* Add other styles as needed */
+        .login-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 500;
+            color: #37A652;
+            /* 밝은 그린 색상 */
+        }
+
+        .input,
+        .login-button {
+            border-radius: 5px;
+        }
+
+        .input {
+            background-color: #F5F5F5;
+            /* 밝은 배경색 */
+            color: #333333;
+            /* 어두운 텍스트 색상 */
+            border: 1px solid #48D96C;
+            /* 밝은 그린 색상 */
+        }
+
+        .input::placeholder {
+            color: #B0B0B0;
+            /* 연한 그레이 색상 */
+        }
+
+        .login-button {
+            width: 100%;
+            background-color: #48D96C;
+            /* 밝은 그린 색상 */
+            color: #FFFFFF;
+            /* 흰색 텍스트 */
+            border: none;
+            font-weight: bold;
+        }
+
+        .login-button:hover {
+            background-color: #37A652;
+            /* 어두운 그린 색상 */
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 1rem;
+            color: #37A652;
+            /* 밝은 그린 색상 */
+        }
+
+        .signup-link a {
+            color: #37A652;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .signup-link a:hover {
+            color: #48D96C;
+            /* 밝은 그린 색상 */
+        }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
@@ -105,7 +116,7 @@
                     localStorage.setItem('access_token', response.access_token); // 토큰을 로컬 스토리지에 저장
                     localStorage.setItem('refresh_token', response.refresh_token); // 리프레시 토큰을 로컬 스토리지에 저장
                     console.log("Login successful");
-                    
+
                     window.location.href = "/main"; // 로그인 성공 시 메인 페이지로 이동
                 },
                 error: function (xhr, status, error) {
@@ -137,25 +148,49 @@
             });
         }
 
-        window.onload = function(){
+        window.onload = function () {
             var refresh_token = localStorage.getItem('refresh_token');
             if (!refresh_token) {
                 refreshAccessToken();
             }
+
+            // 엔터 키를 눌렀을 때 로그인 함수 호출
+            document.getElementById("password").addEventListener("keypress", function (event) {
+                if (event.key === "Enter") {
+                    login();
+                }
+            });
         }
     </script>
 </head>
 
 <body>
-    <h1>호구조사 Login Page</h1>
-    <form>
-        <label for="id">ID:</label><br>
-        <input type="text" id="id" name="id"><br>
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password"><br><br>
-        <button type="button" onclick="login()">시작하기</button>
-    </form>
-    <p>계정이 없으신가요? <a href="/signup">회원가입</a></p>
+    <div class="login-container">
+        <div class="login-box">
+            <h1 class="login-title">호구조사 Login Page</h1>
+            <form>
+                <div class="field">
+                    <label class="label" for="id" style="color: #37A652;">ID</label>
+                    <div class="control">
+                        <input class="input" type="text" id="id" name="id" placeholder="Enter your ID">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label" for="password" style="color: #37A652;">Password</label>
+                    <div class="control">
+                        <input class="input" type="password" id="password" name="password"
+                            placeholder="Enter your password">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="control">
+                        <button class="button login-button" type="button" onclick="login()">시작하기</button>
+                    </div>
+                </div>
+            </form>
+            <p class="signup-link">계정이 없으신가요? <a href="/signup">회원가입</a></p>
+        </div>
+    </div>
 </body>
 
 </html>

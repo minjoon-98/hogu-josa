@@ -1,2 +1,2 @@
-.venv/* linguist-detectable=false
+.venv/** linguist-detectable=false
 get-pip.py linguist-detectable=false

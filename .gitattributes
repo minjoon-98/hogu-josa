@@ -1,0 +1,2 @@
+.venv/* linguist-detectable=false
+./get-pip.py
